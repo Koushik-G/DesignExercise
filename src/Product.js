@@ -5,18 +5,18 @@ const { Meta } = Card;
 
 function Product(props) {
   return (
-    <div className="App">
+    <div className="product">
       <Card
         hoverable
         style={{ width: 240 }}
         cover={
           <img
             alt="example"
-            src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+            src={props.item.image}
           />
         }
       >
-        <Meta title="Europe Street beat" description="www.instagram.com" />
+        <Meta title={props.item.title} description={props.item.price} />
       </Card>
     </div>
   );

@@ -1,69 +1,73 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Row, Col } from "antd";
 import { Menu, Dropdown, Button, Icon, message } from "antd";
 import { PageHeader } from "antd";
+import fakedata from "./fakedata";
 import Product from "./Product";
 import logo from "./logo.svg";
 import "./App.css";
 
-
-
 function App() {
+  const [currency, setCurrency] = useState("INR");
 
-  const [currency, setCurrency] = useState("INR") 
+  const [products, setProducts] = useState(fakedata);
 
-  function handleMenuClick({key}){
-
+  function handleMenuClick({ key }) {
+    fetch(`https://api.exchangeratesapi.io/latest?base=${currency}`)
+    .then(res => {
+      return res.json();
+    })
+    .then((data) => {
+      console.log(data);
+      setProducts(
+        products.map((item) => {
+          return {
+            ...item,
+            price: parseFloat(Math.round((item.price * data.rates[key]) * 100) / 100).toFixed(2)
+          }
+        })
+      )
+    });
+    setCurrency(key);
   }
 
   const menu = (
     <Menu onClick={handleMenuClick}>
-      <Menu.Item key="INR"><Icon type="dollar" />INR</Menu.Item>
-      <Menu.Item key="USD"><Icon type="dollar" />USD</Menu.Item>
+      <Menu.Item key="INR">
+        <Icon type="dollar" />
+        INR
+      </Menu.Item>
+      <Menu.Item key="USD">
+        <Icon type="dollar" />
+        USD
+      </Menu.Item>
     </Menu>
   );
-  
-  function handleMenuClick(e) {
-    message.info('Click on menu item.');
-    console.log('click', e);
-  }
+    console.log(products);
+  const productCollection = products.map((item, index) => {
+    return (
+      <Col sm={24} md={8} lg={4} key={index}>
+        <Product item={item} />
+      </Col>
+    );
+  });
 
   return (
-    <div className="">
+    <div className="App">
       <PageHeader
         title="Design Exercise"
         extra={[
           <Dropdown overlay={menu}>
             <Button type="primary">
-              Currency<Icon type="down" />
+              {currency}
+              <Icon type="down" />
             </Button>
           </Dropdown>
         ]}
       />
-      <Row>
-        <Col sm={24} md={8} lg={4}>
-          <Product />
-        </Col>
-        <Col sm={24} md={8} lg={4}>
-          <Product />
-        </Col>
-        <Col sm={24} md={8} lg={4}>
-          <Product />
-        </Col>
-        <Col sm={24} md={8} lg={4}>
-          <Product />
-        </Col>
-        <Col sm={24} md={8} lg={4}>
-          <Product />
-        </Col>
-        <Col sm={24} md={8} lg={4}>
-          <Product />
-        </Col>
-      </Row>
+      <Row>{productCollection}</Row>
     </div>
   );
 }
-
-
 
 export default App;
